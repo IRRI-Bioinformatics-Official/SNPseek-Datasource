@@ -1,10 +1,10 @@
 # SNPseek Datasource
 
-A comprehensive data management system for SNP (Single Nucleotide Polymorphism) data, providing efficient access and integration with genomic databases.
+A SNP data source that exposes and organizes variant data from the SNPseek backend database, supporting the SNPseek web application and related analytical and integration use cases.
 
 ## Overview
 
-SNPseek Datasource is a Java-based application built on the Spring Framework that provides data access layers for managing and querying SNP-related genomic information. The system integrates with CHADO database schemas and provides a robust API for genomic data operations.
+SNPseek Datasource is a Java-based application built on the Spring Framework that provides data access layers for managing and querying SNP-related genomic information. It is based on the CHADO database schema, with targeted modifications and extensions to tailor the model to the specific requirements of the SNPseek system, and exposes a robust API for genomic data operations.
 
 ## Features
 
