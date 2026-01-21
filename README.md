@@ -75,7 +75,16 @@ Update your database connection settings in the Spring configuration files:
 
 ```xml
 <!-- Example configuration in incDS_prod_crud-dao-context.xml -->
-<context:component-scan base-package="org.trri.tric.ds.chado.dao.impl" />
+<bean class="org.apache.commons.dbcp.BasicDataSource"
+		destroy-method="close" name="IRIC_ProductionDS_PG">
+		<property name="driverClassName"
+			value="org.postgresql.Driver" />
+		<property name="username" value="${DB_USERNAME}" />
+		<property name="password" value="${DB_PASSWORD}" />
+		<property name="url" value="${DB_URL}" />
+		<property name="maxIdle" value="1" />
+		<property name="maxActive" value="10" />
+	</bean>
 ```
 
 ### Spring Context
