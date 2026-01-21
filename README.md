@@ -23,8 +23,9 @@ snpseek-datasource/
 │   │   ├── java/
 │   │   │   └── org/trri/tric/ds/chado/
 │   │   │       ├── dao/           # Data Access Objects
-│   │   │       ├── domain/        # Domain models
-│   │   │       └── impl/          # DAO implementations
+│   │   │       │  └── impl/    # DAO implementations
+│   │   │       └── domain/        # Domain models
+│   │   │          └── impl/       # implementations
 │   │   └── resources/
 │   │       ├── META-INF/
 │   │       └── *.xml              # Spring configuration files
@@ -51,18 +52,17 @@ snpseek-datasource/
    ```
 
 2. **Configure database connection**
-   
-   Edit the configuration files in `src/resources/`:
-   - Update database connection properties
-   - Configure data source settings
-   - Set appropriate credentials
+   - Configure database connection and data source properties
+   - Review and adjust connection-related settings as needed
+   - Credentials are read from environment variables by default
+      - Values defined in the configuration file may override the environment variables if explicitly provided
 
-3. **Build the project**
+4. **Build the project**
    ```bash
    mvn clean install
    ```
 
-4. **Run tests**
+5. **Run tests**
    ```bash
    mvn test
    ```
