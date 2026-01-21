@@ -13,14 +13,20 @@ import java.util.TreeSet;
 import java.util.logging.Logger;
 
 import org.hibernate.Session;
+import org.irri.iric.ds.chado.dao.FeatureDAO;
+import org.irri.iric.ds.chado.domain.Feature;
 import org.irri.iric.ds.chado.domain.Locus;
 import org.irri.iric.ds.chado.domain.impl.MultiReferencePositionImpl;
 import org.skyway.spring.util.dao.AbstractJpaDao;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 
 abstract public class SnpsPropertyDAO<T> extends AbstractJpaDao<T> {
 
 	private Logger log = Logger.getLogger(SnpsPropertyDAO.class.getName());
+	
+	@Autowired
+	private FeatureDAO featureDAO;
 
 	protected abstract Session getSession();
 
@@ -43,6 +49,8 @@ abstract public class SnpsPropertyDAO<T> extends AbstractJpaDao<T> {
 	public Set findSnpsPropertyByChrPosIn(Integer organismId, String chr, Collection poslist, Set variantset, String propname,
 			String viewname, String columnname, Class retclass) {
 
+		Feature feature = featureDAO.findFeatureByUniquenameAndOrganismId(chr, organismId);
+		
 		Set setSnpfeatureid = new HashSet();
 		if (chr.toLowerCase().equals("any")) {
 
@@ -103,7 +111,7 @@ abstract public class SnpsPropertyDAO<T> extends AbstractJpaDao<T> {
 				// if (AppContext.isBypassViews() && AppContext.isPostgres()) {
 
 				String sqldirect = "";
-				sqldirect += "SELECT sfl.snp_feature_id, sfl.srcfeature_id-" + DbUtils.chr2srcfeatureidOffset(organismId)
+				sqldirect += "SELECT sfl.snp_feature_id, sfl.srcfeature_id-" + feature.getFeatureId()
 						+ " AS chromosome, sfl.position + 1 AS \"position\", v.variantset_id AS type_id, v.name AS variantset "
 						+ columnname;
 				sqldirect += " FROM public.snp_featureloc sfl, public.variant_variantset vvs, public.variantset v ";
@@ -111,7 +119,7 @@ abstract public class SnpsPropertyDAO<T> extends AbstractJpaDao<T> {
 				sqldirect += "  AND sfp.type_id in (select cvterm_id from cvterm where name='" + propname
 						+ "') and v.name in (" + DbUtils.toCSVquoted(variantset, "'") + ")";
 				sqldirect += " and sfl.organism_id=" + DbUtils.getDefaultOrganismId() + " and sfl.srcfeature_id="
-						+ DbUtils.guessSrcfeataureidFromString(chr, organismId);
+						+ feature.getFeatureId();
 				sqldirect += " and exists ( select t.column_value from (select unnest(ARRAY" + sets[iset]
 						+ ")column_value) t where t.column_value-1=sfl.position ) ";
 				sqldirect += " order by sfl.position";
@@ -136,6 +144,8 @@ abstract public class SnpsPropertyDAO<T> extends AbstractJpaDao<T> {
 	public Set findSnpsPropertyByChrPosBetween(Integer organismId, String chr, Integer start, Integer end, BigDecimal typeid,
 			String propname, String viewname, String columnname, Class retclass) throws DataAccessException {
 
+		Feature feature = featureDAO.findFeatureByUniquenameAndOrganismId(chr, organismId);
+		
 		// TODO check for the bypass
 		// if (AppContext.isBypassViews()) {
 		if (columnname == null)
@@ -144,14 +154,14 @@ abstract public class SnpsPropertyDAO<T> extends AbstractJpaDao<T> {
 			columnname = ", sfp.value AS " + columnname;
 
 		String sqldirect = "";
-		sqldirect += "SELECT sfl.snp_feature_id, sfl.srcfeature_id-" + DbUtils.chr2srcfeatureidOffset(organismId)
+		sqldirect += "SELECT sfl.snp_feature_id, sfl.srcfeature_id-" + feature.getFeatureId()
 				+ " AS chromosome, sfl.position + 1 AS \"position\", v.variantset_id AS type_id, v.name AS variantset "
 				+ columnname;
 		sqldirect += " FROM public.snp_featureloc sfl, public.variant_variantset vvs, public.variantset v ";
 		sqldirect += " , snp_featureprop sfp  WHERE  sfl.snp_feature_id = sfp.snp_feature_id and sfl.snp_feature_id = vvs.variant_feature_id AND vvs.variantset_id = v.variantset_id ";
 		sqldirect += "  AND sfp.type_id in (select cvterm_id from cvterm where name='" + propname + "')";
 		sqldirect += " and sfl.organism_id=" + +organismId + " and sfl.srcfeature_id="
-				+ DbUtils.guessSrcfeataureidFromString(chr, organismId);
+				+ feature.getFeatureId();
 		sqldirect += " and sfl.position between " + start + "-1 and " + end + "-1 and v.variantset_id=" + typeid
 				+ " order by sfl.position";
 		return new LinkedHashSet(executeSQL(sqldirect, retclass));
@@ -163,6 +173,7 @@ abstract public class SnpsPropertyDAO<T> extends AbstractJpaDao<T> {
 	public Set findSnpsPropertyByChrPosBetween(Integer organismId, String chr, Integer start, Integer end, Set variantset, String propname,
 			String viewname, String columnname, Class retclass) throws DataAccessException {
 
+		Feature feature = featureDAO.findFeatureByUniquenameAndOrganismId(chr, organismId);
 		// TODO Check for the bypass option
 		// if (AppContext.isBypassViews()) {
 		if (columnname == null)
@@ -172,7 +183,7 @@ abstract public class SnpsPropertyDAO<T> extends AbstractJpaDao<T> {
 
 		// using position
 		String sqldirect = "";
-		sqldirect += "SELECT sfl.snp_feature_id, sfl.srcfeature_id-" + DbUtils.chr2srcfeatureidOffset(organismId)
+		sqldirect += "SELECT sfl.snp_feature_id, sfl.srcfeature_id-" + feature.getFeatureId()
 				+ " AS chromosome, sfl.position + 1 AS \"position\", v.variantset_id AS type_id, v.name AS variantset "
 				+ columnname;
 		sqldirect += " FROM public.snp_featureloc sfl, public.variant_variantset vvs, public.variantset v, ";
@@ -180,7 +191,7 @@ abstract public class SnpsPropertyDAO<T> extends AbstractJpaDao<T> {
 		sqldirect += " , snp_featureprop sfp  WHERE  sfl3k.snp_feature_id = sfp.snp_feature_id and sfl.snp_feature_id = vvs.variant_feature_id AND vvs.variantset_id = v.variantset_id ";
 		sqldirect += "  AND sfp.type_id in (select cvterm_id from cvterm where name='" + propname + "')";
 		sqldirect += " and sfl3k.organism_id=" + DbUtils.getDefaultOrganismId() + " and sfl3k.srcfeature_id="
-				+ DbUtils.guessSrcfeataureidFromString(chr, organismId);
+				+ feature.getFeatureId();
 		sqldirect += " and sfl3k.position=sfl.position and sfl3k.srcfeature_id=sfl.srcfeature_id and sfl.organism_id="
 				+ DbUtils.getDefaultOrganismId();
 		sqldirect += " and sfl3k.position between " + start + "-1 and " + end + "-1 and v.name in ("
@@ -204,7 +215,9 @@ abstract public class SnpsPropertyDAO<T> extends AbstractJpaDao<T> {
 
 	public Set findSnpsPropertyByFeatureidIn(Integer organismId, Collection featureid, String propname, String viewname, String columnname,
 			Class retclass) throws DataAccessException {
-
+		
+		Feature feature = featureDAO.findFeatureByUniquenameAndOrganismId("chr01", organismId);
+		
 		if (columnname != null && !columnname.isEmpty()) {
 			if (!columnname.startsWith(","))
 				columnname = ", sfp.value AS " + columnname;
@@ -219,7 +232,7 @@ abstract public class SnpsPropertyDAO<T> extends AbstractJpaDao<T> {
 			// if (AppContext.isBypassViews() && AppContext.isPostgres()) {
 			// using position
 			String sqldirect = "";
-			sqldirect += "SELECT sfl.snp_feature_id, sfl.srcfeature_id-" + DbUtils.chr2srcfeatureidOffset(organismId)
+			sqldirect += "SELECT sfl.snp_feature_id, sfl.srcfeature_id-" + feature.getFeatureId()
 					+ " AS chromosome, sfl.position + 1 AS \"position\", v.variantset_id AS type_id, v.name AS variantset "
 					+ columnname;
 			sqldirect += " FROM public.snp_featureloc sfl, public.variant_variantset vvs, public.variantset v, ";

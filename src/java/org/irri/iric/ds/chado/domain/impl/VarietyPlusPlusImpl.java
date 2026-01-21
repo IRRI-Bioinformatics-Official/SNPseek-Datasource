@@ -1,5 +1,6 @@
 package org.irri.iric.ds.chado.domain.impl;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
@@ -15,7 +16,7 @@ import org.irri.iric.ds.chado.domain.VarietyPlusPlus;
  * @author LMansueto
  *
  */
-public class VarietyPlusPlusImpl implements VarietyPlusPlus {
+public class VarietyPlusPlusImpl implements VarietyPlusPlus, Serializable {
 
 	private Variety varplus;
 	private Map mapValues;

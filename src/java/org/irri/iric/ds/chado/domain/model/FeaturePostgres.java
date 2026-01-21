@@ -57,7 +57,7 @@ public class FeaturePostgres implements Serializable, org.irri.iric.ds.chado.dom
 	@Basic(fetch = FetchType.EAGER)
 	@Id
 	@XmlElement
-	BigDecimal featureId;
+	Integer featureId;
 	/**
 	 */
 
@@ -71,7 +71,7 @@ public class FeaturePostgres implements Serializable, org.irri.iric.ds.chado.dom
 	@Column(name = "ORGANISM_ID", nullable = false)
 	@Basic(fetch = FetchType.EAGER)
 	@XmlElement
-	BigDecimal organismId;
+	Integer organismId;
 	/**
 	 */
 
@@ -116,14 +116,14 @@ public class FeaturePostgres implements Serializable, org.irri.iric.ds.chado.dom
 	@Column(name = "IS_ANALYSIS", nullable = false)
 	@Basic(fetch = FetchType.EAGER)
 	@XmlElement
-	Integer isAnalysis;
+	Boolean isAnalysis;
 	/**
 	 */
 
 	@Column(name = "IS_OBSOLETE", nullable = false)
 	@Basic(fetch = FetchType.EAGER)
 	@XmlElement
-	Integer isObsolete;
+	Boolean isObsolete;
 	/**
 	 */
 	@Temporal(TemporalType.TIMESTAMP)
@@ -148,13 +148,13 @@ public class FeaturePostgres implements Serializable, org.irri.iric.ds.chado.dom
 
 	/**
 	 */
-	public void setFeatureId(BigDecimal featureId) {
+	public void setFeatureId(Integer featureId) {
 		this.featureId = featureId;
 	}
 
 	/**
 	 */
-	public BigDecimal getFeatureId() {
+	public Integer getFeatureId() {
 		return this.featureId;
 	}
 
@@ -172,13 +172,13 @@ public class FeaturePostgres implements Serializable, org.irri.iric.ds.chado.dom
 
 	/**
 	 */
-	public void setOrganismId(BigDecimal organismId) {
+	public void setOrganismId(Integer organismId) {
 		this.organismId = organismId;
 	}
 
 	/**
 	 */
-	public BigDecimal getOrganismId() {
+	public Integer getOrganismId() {
 		return this.organismId;
 	}
 
@@ -244,25 +244,25 @@ public class FeaturePostgres implements Serializable, org.irri.iric.ds.chado.dom
 
 	/**
 	 */
-	public void setIsAnalysis(Integer isAnalysis) {
+	public void setIsAnalysis(Boolean isAnalysis) {
 		this.isAnalysis = isAnalysis;
 	}
 
 	/**
 	 */
-	public Integer getIsAnalysis() {
+	public Boolean getIsAnalysis() {
 		return this.isAnalysis;
 	}
 
 	/**
 	 */
-	public void setIsObsolete(Integer isObsolete) {
+	public void setIsObsolete(Boolean isObsolete) {
 		this.isObsolete = isObsolete;
 	}
 
 	/**
 	 */
-	public Integer getIsObsolete() {
+	public Boolean getIsObsolete() {
 		return this.isObsolete;
 	}
 

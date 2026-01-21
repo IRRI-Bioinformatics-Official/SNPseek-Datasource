@@ -1,5 +1,6 @@
 package org.irri.iric.ds.chado.dao.impl;
 
+import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
@@ -559,5 +560,29 @@ public class FeatureDAOImpl extends AbstractJpaDao<Feature> implements FeatureDA
 	 * = (Feature)listFeature.get(0); return
 	 * AppContext.clobStringConversion(feature.getResidues()); }
 	 */
+
+	@Override
+	public Feature findFeatureByUniquenameAndOrganismId(String uniquename, int orgId)
+			throws DataAccessException {
+		
+		BigDecimal organismId = new BigDecimal(orgId);
+		
+		Query query = entityManager.createNamedQuery("findFeatureByOrganismIdAndUniqueName");
+		query.setParameter(1, Integer.valueOf(orgId));   // BigDecimal
+		query.setParameter(2, uniquename);   // String
+		System.out.println("organismId:" + Integer.valueOf(orgId));
+		System.out.println("uniquename:" + uniquename);
+		System.out.println(query.unwrap(org.hibernate.Query.class).getNamedParameters());
+		System.out.println("query: "+ query.unwrap(org.hibernate.Query.class).getQueryString());
+		
+		
+
+		try {
+		    return (Feature) query.getSingleResult();
+		} catch (NoResultException e) {
+		    return null;
+		}
+		
+	}
 
 }

@@ -37,14 +37,22 @@ public class DbUtils {
 	private static Map<String, Integer> mapVariant2Order;
 	private static Properties webProp;
 
-	private static Map<Integer, Integer> offsetMap;
-
-	static {
-		offsetMap = new HashMap<>();
-		offsetMap.put(9, 2);
-		offsetMap.put(23, 7651231);
-
-	}
+//	private static Map<Integer, Integer> offsetMap;
+//
+//	static {
+//		offsetMap = new HashMap<>();
+////		v3 Mapping
+////		offsetMap.put(9, 2);
+////		offsetMap.put(23, 7651231);
+////		offsetMap.put(25, 7747424);
+////		offsetMap.put(24, 7711148);
+//// 20k Mapping		
+//		offsetMap.put(9, 2);
+//		offsetMap.put(23, 7651231);
+////		1k1 Mapping
+////		offsetMap.put(9, 2);
+////		offsetMap.put(24, 7651231);
+//	}
 
 	/**
 	 * Slice a large set into groups of 1000, (for oracle IN has limit 1000)
@@ -255,10 +263,10 @@ public class DbUtils {
 
 	}
 
-	public static String guessSrcfeataureidFromString(String chr, Integer organismId) {
-		return Integer.toString(
-				chr2srcfeatureidOffset(organismId) + Integer.valueOf(chr.toUpperCase().replace("CHR0", "").replace("CHR", "")));
-	}
+//	public static String guessSrcfeataureidFromString(String chr, Integer organismId) {
+//		return Integer.toString(
+//				chr2srcfeatureidOffset(organismId) + Integer.valueOf(chr.toUpperCase().replace("CHR0", "").replace("CHR", "")));
+//	}
 
 	
 	public static void setWebProp(Properties config) {
@@ -426,16 +434,16 @@ public class DbUtils {
 
 	
 
-	public static Integer chr2srcfeatureidOffset(int organismid) {
-		return offsetMap.get(organismid);
-
-	}
-
-	
-
-	public static Integer chr2srcfeatureidOffset(Integer organismId) {
-		return offsetMap.get(organismId);
-
-	}
+//	public static Integer chr2srcfeatureidOffset(int organismid) {
+//		return offsetMap.get(organismid);
+//
+//	}
+//
+//	
+//
+//	public static Integer chr2srcfeatureidOffset(Integer organismId) {
+//		return offsetMap.get(organismId);
+//
+//	}
 
 }

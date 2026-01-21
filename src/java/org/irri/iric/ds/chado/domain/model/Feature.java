@@ -40,6 +40,7 @@ import org.irri.iric.ds.utils.DbUtils;
 		@NamedQuery(name = "findFeatureByName", query = "select myFeature from Feature myFeature where myFeature.name = ?1"),
 		@NamedQuery(name = "findFeatureByNameContaining", query = "select myFeature from Feature myFeature where myFeature.name like ?1"),
 		@NamedQuery(name = "findFeatureByOrganismId", query = "select myFeature from Feature myFeature where myFeature.organismId = ?1"),
+		@NamedQuery(name = "findFeatureByOrganismIdAndUniqueName", query = "select myFeature from Feature myFeature where myFeature.organismId = ?1 and ( upper(myFeature.uniquename) like upper(?2) or upper(myFeature.name) like upper(?2))"),
 		@NamedQuery(name = "findFeatureByPrimaryKey", query = "select myFeature from Feature myFeature where myFeature.featureId = ?1"),
 		@NamedQuery(name = "findFeatureBySeqlen", query = "select myFeature from Feature myFeature where myFeature.seqlen = ?1"),
 		@NamedQuery(name = "findFeatureByTimeaccessioned", query = "select myFeature from Feature myFeature where myFeature.timeaccessioned = ?1"),
@@ -60,7 +61,7 @@ public class Feature implements Serializable, org.irri.iric.ds.chado.domain.Feat
 	@Basic(fetch = FetchType.EAGER)
 	@Id
 	@XmlElement
-	BigDecimal featureId;
+	Integer featureId;
 	/**
 	 */
 
@@ -74,7 +75,7 @@ public class Feature implements Serializable, org.irri.iric.ds.chado.domain.Feat
 	@Column(name = "ORGANISM_ID", nullable = false)
 	@Basic(fetch = FetchType.EAGER)
 	@XmlElement
-	BigDecimal organismId;
+	Integer organismId;
 	/**
 	 */
 
@@ -86,11 +87,9 @@ public class Feature implements Serializable, org.irri.iric.ds.chado.domain.Feat
 	 */
 
 	@Column(name = "RESIDUES")
-	@Basic(fetch = FetchType.EAGER)
-	@Lob
-	@XmlElement
+	@Basic(fetch = FetchType.LAZY)
 	// byte[] residues;
-	Clob residues;
+	String residues;
 	/**
 	 */
 
@@ -118,14 +117,14 @@ public class Feature implements Serializable, org.irri.iric.ds.chado.domain.Feat
 	@Column(name = "IS_ANALYSIS", nullable = false)
 	@Basic(fetch = FetchType.EAGER)
 	@XmlElement
-	Integer isAnalysis;
+	Boolean isAnalysis;
 	/**
 	 */
 
 	@Column(name = "IS_OBSOLETE", nullable = false)
 	@Basic(fetch = FetchType.EAGER)
 	@XmlElement
-	Integer isObsolete;
+	Boolean isObsolete;
 	/**
 	 */
 	@Temporal(TemporalType.TIMESTAMP)
@@ -150,13 +149,13 @@ public class Feature implements Serializable, org.irri.iric.ds.chado.domain.Feat
 
 	/**
 	 */
-	public void setFeatureId(BigDecimal featureId) {
+	public void setFeatureId(Integer featureId) {
 		this.featureId = featureId;
 	}
 
 	/**
 	 */
-	public BigDecimal getFeatureId() {
+	public Integer getFeatureId() {
 		return this.featureId;
 	}
 
@@ -174,13 +173,13 @@ public class Feature implements Serializable, org.irri.iric.ds.chado.domain.Feat
 
 	/**
 	 */
-	public void setOrganismId(BigDecimal organismId) {
+	public void setOrganismId(Integer organismId) {
 		this.organismId = organismId;
 	}
 
 	/**
 	 */
-	public BigDecimal getOrganismId() {
+	public Integer getOrganismId() {
 		return this.organismId;
 	}
 
@@ -198,26 +197,26 @@ public class Feature implements Serializable, org.irri.iric.ds.chado.domain.Feat
 
 	/**
 	 */
-	public void setResidues(Clob residues) {
+	public void setResidues(String residues) {
 		this.residues = residues;
 	}
 
-	/**
-	 */
-	public String getResidues() {
-		try {
-			return DbUtils.clobStringConversion(this.residues);
-		} catch (Exception ex) {
-			ex.printStackTrace();
-		}
-		return null;
-	}
-
-	@Override
-	public void setResidues(String residues) {
-		
-
-	}
+//	/**
+//	 */
+//	public String getResidues() {
+//		try {
+//			return DbUtils.clobStringConversion(this.residues);
+//		} catch (Exception ex) {
+//			ex.printStackTrace();
+//		}
+//		return null;
+//	}
+//
+//	@Override
+//	public void setResidues(String residues) {
+//		
+//
+//	}
 
 	/**
 	 */
@@ -257,25 +256,25 @@ public class Feature implements Serializable, org.irri.iric.ds.chado.domain.Feat
 
 	/**
 	 */
-	public void setIsAnalysis(Integer isAnalysis) {
+	public void setIsAnalysis(Boolean isAnalysis) {
 		this.isAnalysis = isAnalysis;
 	}
 
 	/**
 	 */
-	public Integer getIsAnalysis() {
+	public Boolean getIsAnalysis() {
 		return this.isAnalysis;
 	}
 
 	/**
 	 */
-	public void setIsObsolete(Integer isObsolete) {
+	public void setIsObsolete(Boolean isObsolete) {
 		this.isObsolete = isObsolete;
 	}
 
 	/**
 	 */
-	public Integer getIsObsolete() {
+	public Boolean getIsObsolete() {
 		return this.isObsolete;
 	}
 
@@ -394,9 +393,14 @@ public class Feature implements Serializable, org.irri.iric.ds.chado.domain.Feat
 	public String getSequenceInPosition(long start, long end) {
 		
 		try {
-			return DbUtils.clobStringConversion(this.residues).substring((int) start, (int) end);
+			return this.residues.substring((int) start, (int) end);
 		} catch (Exception ex) {
 			throw new RuntimeException(ex);
 		}
+	}
+
+	@Override
+	public String getResidues() {
+		return this.getResidues();
 	}
 }

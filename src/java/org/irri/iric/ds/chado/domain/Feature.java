@@ -7,11 +7,11 @@ public interface Feature {
 
 	/**
 	 */
-	public void setFeatureId(BigDecimal featureId);
+	public void setFeatureId(Integer featureId);
 
 	/**
 	 */
-	public BigDecimal getFeatureId();
+	public Integer getFeatureId();
 
 	/**
 	 */
@@ -23,11 +23,11 @@ public interface Feature {
 
 	/**
 	 */
-	public void setOrganismId(BigDecimal organismId);
+	public void setOrganismId(Integer organismId);
 
 	/**
 	 */
-	public BigDecimal getOrganismId();
+	public Integer getOrganismId();
 
 	/**
 	 */
@@ -71,19 +71,19 @@ public interface Feature {
 
 	/**
 	 */
-	public void setIsAnalysis(Integer isAnalysis);
+	public void setIsAnalysis(Boolean isAnalysis);
 
 	/**
 	 */
-	public Integer getIsAnalysis();
+	public Boolean getIsAnalysis();
 
 	/**
 	 */
-	public void setIsObsolete(Integer isObsolete);
+	public void setIsObsolete(Boolean isObsolete);
 
 	/**
 	 */
-	public Integer getIsObsolete();
+	public Boolean getIsObsolete();
 
 	/**
 	 */

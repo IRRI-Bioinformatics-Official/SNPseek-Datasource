@@ -19,13 +19,15 @@ import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
 
 import org.hibernate.Session;
+import org.irri.iric.ds.chado.dao.FeatureDAO;
 import org.irri.iric.ds.chado.dao.VSnpRefposindexDAO;
+import org.irri.iric.ds.chado.domain.Feature;
 import org.irri.iric.ds.chado.domain.Locus;
 import org.irri.iric.ds.chado.domain.impl.MultiReferencePositionImpl;
-import org.irri.iric.ds.chado.domain.model.Organism;
 import org.irri.iric.ds.chado.domain.model.VSnpRefposindex;
 import org.irri.iric.ds.utils.DbUtils;
 import org.skyway.spring.util.dao.AbstractJpaDao;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
@@ -38,6 +40,8 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class VSnpRefposindexDAOImpl extends AbstractJpaDao<VSnpRefposindex> implements VSnpRefposindexDAO {
 
+	@Autowired
+	private FeatureDAO featureDAO;
 	/**
 	 * Set of entity classes managed by this DAO. Typically a DAO manages a single
 	 * entity.
@@ -392,26 +396,31 @@ public class VSnpRefposindexDAOImpl extends AbstractJpaDao<VSnpRefposindex> impl
 
 		System.out.println("GET SNPS.." );
 		
-		
+		String chrStr = chr;
 		BigDecimal bdChr = null;
 		try {
 
 			System.out.println("Setting CHR.." + chr);
+			
 
 			chr = chr.toUpperCase().replace("CHROMOSOME0", "").replace("CHROMOSOME", "").replace("CHR0", "")
 					.replace("CHR", "");
 			
 			System.out.println("CHR.." + chr);
 
+			Feature feature = featureDAO.findFeatureByUniquenameAndOrganismId(chrStr, organismId);
+//			Set<Feature> features = featureDAO.findFeatureByOrganismId(organismId);
+//			Feature feature = features.iterator().next();
+//			
+			
 			try {
-				bdChr = BigDecimal.valueOf(Long.valueOf(chr));
 				if (startPos != null && endPos != null) {
 					// TIMER HERE DAGS
 					// TODO check bypass
 					// if (AppContext.isBypassViews()) {
 
 					String sqldirect = "";
-					sqldirect += "SELECT sfl.snp_feature_id, sfl.srcfeature_id-" + DbUtils.chr2srcfeatureidOffset(organismId)
+					sqldirect += "SELECT sfl.snp_feature_id, " + chr
 							+ " AS chromosome, sfl.position + 1 AS \"position\", sfl.refcall, '' AS altcall, ";
 					sqldirect += " vvs.hdf5_index AS allele_index, v.variantset_id AS type_id, v.name AS variantset FROM "
 							+ "public.snp_featureloc sfl, " + "public.variant_variantset vvs, "
@@ -420,7 +429,7 @@ public class VSnpRefposindexDAOImpl extends AbstractJpaDao<VSnpRefposindex> impl
 					// sqldirect+=" and NULLIF(replace(lower(srcf.name::text), 'chr'::text,
 					// ''::text), ''::text)::integer=" + bdChr;
 					sqldirect += " and sfl.organism_id=" + organismId + " and sfl.srcfeature_id="
-							+ bdChr + "+" + DbUtils.chr2srcfeatureidOffset(organismId);
+							+  feature.getFeatureId();
 					sqldirect += " and sfl.position between " + startPos + "-1 and " + endPos + "-1 and v.name in ("
 							+ DbUtils.toCSVquoted(variantset, "'") + ") order by sfl.position";
 
@@ -441,7 +450,7 @@ public class VSnpRefposindexDAOImpl extends AbstractJpaDao<VSnpRefposindex> impl
 						// TODO check bypass
 						// if (AppContext.isBypassViews()) {
 						String sqldirect = "";
-						sqldirect += "SELECT sfl.snp_feature_id, sfl.srcfeature_id- " + DbUtils.chr2srcfeatureidOffset(organismId)
+						sqldirect += "SELECT sfl.snp_feature_id, sfl.srcfeature_id- " + feature.getFeatureId()
 								+ " AS chromosome, sfl.position + 1 AS \"position\", sfl.refcall, ''  AS altcall, ";
 						sqldirect += " vvs.hdf5_index AS allele_index, v.variantset_id AS type_id, v.name AS variantset FROM "
 								+ "public.snp_featureloc sfl, " + "public.variant_variantset vvs, "
@@ -1073,9 +1082,11 @@ public class VSnpRefposindexDAOImpl extends AbstractJpaDao<VSnpRefposindex> impl
 	}
 
 	private List _getSNPsInChromosomePostgresBypass(Integer organismId, String chr, Collection posset, Set variantset) {
+		
+		Feature feature = featureDAO.findFeatureByUniquenameAndOrganismId(chr, organismId);
 
 		String sqldirect = "";
-		sqldirect += "SELECT sfl.snp_feature_id, sfl.srcfeature_id-" + DbUtils.chr2srcfeatureidOffset(organismId)
+		sqldirect += "SELECT sfl.snp_feature_id, sfl.srcfeature_id-" + feature.getFeatureId()
 				+ " AS chromosome, sfl.position + 1 AS \"position\", sfl.refcall, '' AS altcall, ";
 		sqldirect += " vvs.hdf5_index AS allele_index, v.variantset_id AS type_id, v.name AS variantset FROM "
 				+ "public.snp_featureloc sfl, " + "public.variant_variantset vvs, public.variantset v ";
@@ -1107,12 +1118,12 @@ public class VSnpRefposindexDAOImpl extends AbstractJpaDao<VSnpRefposindex> impl
 				Collection setPos = (Collection) mapChr2Pos.get(contigstr);
 				poscount += setPos.size();
 
-				sqldirect += "SELECT sfl.snp_feature_id, sfl.srcfeature_id-" + DbUtils.chr2srcfeatureidOffset(organismId)
+				sqldirect += "SELECT sfl.snp_feature_id, sfl.srcfeature_id-" + feature.getFeatureId()
 						+ " AS chromosome, sfl.position + 1 AS \"position\", sfl.refcall, '' AS altcall, ";
 				sqldirect += " vvs.hdf5_index AS allele_index, v.variantset_id AS type_id, v.name AS variantset FROM "
 						+ "public.snp_featureloc sfl, " + "public.variant_variantset vvs, public.variantset v, ";
 				sqldirect += "(select unnest(ARRAY" + setPos + ") column_value) t where sfl.srcfeature_id=" + contig
-						+ "+" + DbUtils.chr2srcfeatureidOffset(organismId) + " and v.name in ("
+						+ "+" + feature.getFeatureId() + " and v.name in ("
 						+ DbUtils.toCSVquoted(variantset, "'") + ") and t.column_value-1=sfl.position ";
 				sqldirect += " and v.variantset_id=vvs.variantset_id and vvs.variant_feature_id=sfl.snp_feature_id ";
 
@@ -1149,7 +1160,7 @@ public class VSnpRefposindexDAOImpl extends AbstractJpaDao<VSnpRefposindex> impl
 				Iterator<Locus> itLocus = setLocus.iterator();
 				while (itLocus.hasNext()) {
 					Locus loc = itLocus.next();
-					sql += "(  sfl.srcfeature_id=" + loc.getChr() + "+" + DbUtils.chr2srcfeatureidOffset(organismId)
+					sql += "(  sfl.srcfeature_id=" + loc.getChr() + "+" + feature.getFeatureId()
 							+ " and sfl.position between " + (loc.getFmin() - 1) + " and " + (loc.getFmax() - 1) + ") ";
 
 					if (itLocus.hasNext())

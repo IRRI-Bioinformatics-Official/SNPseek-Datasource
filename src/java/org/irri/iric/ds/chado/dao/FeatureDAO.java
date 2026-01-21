@@ -187,6 +187,12 @@ public interface FeatureDAO extends JpaDao<Feature>,  SequenceDAO {
 	 *
 	 */
 	public Set<Feature> findFeatureByUniquename(String uniquename_1) throws DataAccessException;
+	/**
+	 * JPQL Query - findFeatureByUniquename
+	 *
+	 */
+	public Feature findFeatureByUniquenameAndOrganismId(String uniquename_1, int organismId) throws DataAccessException;
+
 
 	/**
 	 * JPQL Query - findFeatureByUniquename

@@ -1,5 +1,6 @@
 package org.irri.iric.ds.chado.domain.impl;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -22,7 +23,7 @@ import org.irri.iric.ds.utils.DbUtils;
  * @author LMansueto
  *
  */
-public class MultiReferencePositionImpl implements MultiReferencePosition, Comparable {
+public class MultiReferencePositionImpl implements MultiReferencePosition, Comparable, Serializable {
 
 	protected String organism;
 	protected String contig;
