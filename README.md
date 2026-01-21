@@ -135,9 +135,9 @@ Include SNPseek Datasource as a dependency in your project:
 
 ### Code Structure
 
-- **DAO Layer**: `org.trri.tric.ds.chado.dao`
-- **Implementation**: `org.trri.tric.ds.chado.dao.impl`
-- **Domain Models**: `org.trri.tric.ds.chado.domain`
+- **DAO Layer**: `org.irri.tric.ds.chado.dao`
+- **Implementation**: `org.irri.tric.ds.chado.dao.impl`
+- **Domain Models**: `org.irri.tric.ds.chado.domain`
 - **Configuration**: `src/resources/*.xml`
 
 ## Testing
@@ -189,30 +189,17 @@ mvn clean test jacoco:report
 - Document public APIs with Javadoc
 - Keep commits atomic and well-described
 
-## License
-
-[Specify your license here - e.g., MIT, Apache 2.0, GPL]
-
 ## Contact
 
-- **Project Lead**: [Name]
-- **Email**: [email@example.com]
-- **Organization**: TRRI/TRIC
-- **Repository**: [GitHub/GitLab URL]
+- **Developer**: [Lord Hendrix Barboza]
+- **Email**: [l.h.barboza@cgiar.org]
+- **Organization**: IRRI/Bioinformatics
+
 
 ## Acknowledgments
 
 - Built with Spring Framework
 - Uses CHADO database schema
-- [Other acknowledgments]
-
-## Changelog
-
-### Version 1.0.0 (Current)
-- Initial release
-- Core DAO implementations
-- Spring integration
-- CHADO schema support
 
 ---
 
