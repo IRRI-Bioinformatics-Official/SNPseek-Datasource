@@ -450,7 +450,7 @@ public class VSnpRefposindexDAOImpl extends AbstractJpaDao<VSnpRefposindex> impl
 						// TODO check bypass
 						// if (AppContext.isBypassViews()) {
 						String sqldirect = "";
-						sqldirect += "SELECT sfl.snp_feature_id, sfl.srcfeature_id- " + feature.getFeatureId()
+						sqldirect += "SELECT sfl.snp_feature_id, " + chr
 								+ " AS chromosome, sfl.position + 1 AS \"position\", sfl.refcall, ''  AS altcall, ";
 						sqldirect += " vvs.hdf5_index AS allele_index, v.variantset_id AS type_id, v.name AS variantset FROM "
 								+ "public.snp_featureloc sfl, " + "public.variant_variantset vvs, "
@@ -1083,18 +1083,22 @@ public class VSnpRefposindexDAOImpl extends AbstractJpaDao<VSnpRefposindex> impl
 
 	private List _getSNPsInChromosomePostgresBypass(Integer organismId, String chr, Collection posset, Set variantset) {
 		
+		System.out.println("CHR.." + chr);
+		
 		Feature feature = featureDAO.findFeatureByUniquenameAndOrganismId(chr, organismId);
 
 		String sqldirect = "";
-		sqldirect += "SELECT sfl.snp_feature_id, sfl.srcfeature_id-" + feature.getFeatureId()
-				+ " AS chromosome, sfl.position + 1 AS \"position\", sfl.refcall, '' AS altcall, ";
-		sqldirect += " vvs.hdf5_index AS allele_index, v.variantset_id AS type_id, v.name AS variantset FROM "
-				+ "public.snp_featureloc sfl, " + "public.variant_variantset vvs, public.variantset v ";
-		sqldirect += " WHERE sfl.snp_feature_id = vvs.variant_feature_id AND vvs.variantset_id = v.variantset_id and (";
-
+	
 		BigDecimal bdChr = null;
 		// if(chr.toLowerCase().equals("any")) {
 		if (!chr.toLowerCase().equals("loci")) {
+			
+			sqldirect += "SELECT sfl.snp_feature_id, '" + chr
+					+ "' AS chromosome, sfl.position + 1 AS \"position\", sfl.refcall, '' AS altcall, ";
+			sqldirect += " vvs.hdf5_index AS allele_index, v.variantset_id AS type_id, v.name AS variantset FROM "
+					+ "public.snp_featureloc sfl, " + "public.variant_variantset vvs, public.variantset v ";
+			sqldirect += " WHERE sfl.snp_feature_id = vvs.variant_feature_id AND vvs.variantset_id = v.variantset_id and (";
+
 
 			long poscount = 0;
 			List listPresent = new ArrayList();
@@ -1118,7 +1122,7 @@ public class VSnpRefposindexDAOImpl extends AbstractJpaDao<VSnpRefposindex> impl
 				Collection setPos = (Collection) mapChr2Pos.get(contigstr);
 				poscount += setPos.size();
 
-				sqldirect += "SELECT sfl.snp_feature_id, sfl.srcfeature_id-" + feature.getFeatureId()
+				sqldirect += "SELECT sfl.snp_feature_id, " + chr
 						+ " AS chromosome, sfl.position + 1 AS \"position\", sfl.refcall, '' AS altcall, ";
 				sqldirect += " vvs.hdf5_index AS allele_index, v.variantset_id AS type_id, v.name AS variantset FROM "
 						+ "public.snp_featureloc sfl, " + "public.variant_variantset vvs, public.variantset v, ";
@@ -1142,6 +1146,12 @@ public class VSnpRefposindexDAOImpl extends AbstractJpaDao<VSnpRefposindex> impl
 			return executeSQL(sql);
 		} else {
 
+			sqldirect += "SELECT sfl.snp_feature_id, SUBSTRING(f.\"name\" FROM 4) as \"chromosome\", sfl.position + 1 AS \"position\", sfl.refcall, '' AS altcall, ";
+			sqldirect += " vvs.hdf5_index AS allele_index, v.variantset_id AS type_id, v.name AS variantset FROM "
+					+ "public.feature f , public.snp_featureloc sfl, " + "public.variant_variantset vvs, public.variantset v ";
+			sqldirect += " WHERE f.feature_id = sfl.srcfeature_id AND sfl.snp_feature_id = vvs.variant_feature_id AND vvs.variantset_id = v.variantset_id and (";
+
+			
 			long poscount = 0;
 
 			Map mapChr2Pos = MultiReferencePositionImpl.getMapContig2Loci(posset);
@@ -1160,7 +1170,8 @@ public class VSnpRefposindexDAOImpl extends AbstractJpaDao<VSnpRefposindex> impl
 				Iterator<Locus> itLocus = setLocus.iterator();
 				while (itLocus.hasNext()) {
 					Locus loc = itLocus.next();
-					sql += "(  sfl.srcfeature_id=" + loc.getChr() + "+" + feature.getFeatureId()
+					feature = featureDAO.findFeatureByUniquenameAndOrganismId(loc.getContig(), organismId);
+					sql += "(  sfl.srcfeature_id=" + feature.getFeatureId()
 							+ " and sfl.position between " + (loc.getFmin() - 1) + " and " + (loc.getFmax() - 1) + ") ";
 
 					if (itLocus.hasNext())
